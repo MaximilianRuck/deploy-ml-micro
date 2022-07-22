@@ -1,22 +1,14 @@
-ARG APP_IMAGE=python:3.9
+# syntax=docker/dockerfile:1
+FROM python:3.8
 
-FROM $APP_IMAGE as base
+WORKDIR /python-docker
 
-FROM base as builder
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
-RUN mkdir /install
-WORKDIR /install
+COPY . .
 
-COPY requirements.txt /requirements.txt
+# ENTRYPOINT /bin/bash
+EXPOSE 5001
 
-RUN pip install -r /requirements.txt
-
-FROM base
-ENV FLASK_APP app.py
-WORKDIR /project
-COPY --from=builder /install /usr/local
-ADD . /project/
-
-ENTRYPOINT ["python", "-m", "flask", "run"]
-
-ARG APP_IMAGE=python:3.6.1-alpine
+ENTRYPOINT python ./app.py
